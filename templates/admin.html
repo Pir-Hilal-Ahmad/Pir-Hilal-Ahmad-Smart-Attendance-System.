@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(-45deg, #1d2671, #c33764, #ff6a00, #ee0979);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .btn {
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        input,
+        select,
+        textarea {
+            border-radius: 10px !important;
+        }
+
+        h4 {
+            margin-bottom: 15px;
+        }
+
+        .alert {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark shadow">
+        <div class="container-fluid">
+            <span class="navbar-brand">🛠️ Admin Dashboard</span>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- 🔥 PENDING -->
+        <div class="card">
+            <h4>⏳ Pending Registrations</h4>
+            <table class="table table-warning">
+                <tr>
+                    <th>Name</th>
+                    <th>Reg No</th>
+                    <th>Semester</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for p in pending %}
+                <tr>
+                    <td>{{p[1]}}</td>
+                    <td>{{p[11]}}</td> <!-- ✅ FIXED -->
+                    <td>{{p[3]}}</td>
+                    <td>
+                        <a href="/approve/{{p[0]}}" class="btn btn-success btn-sm">✔</a>
+                        <a href="/reject/{{p[0]}}" class="btn btn-danger btn-sm">✖</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No pending students</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+
+        <!-- 📋 STUDENTS -->
+        <div class="card">
+            <h4>📋 Registered Students</h4>
+            <table class="table table-bordered">
+                <tr class="table-dark">
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Reg No</th>
+                    <th>Semester</th>
+                </tr>
+
+                {% for s in students %}
+                <tr>
+                    <td>{{s[0]}}</td>
+                    <td>{{s[1]}}</td>
+                    <td>{{s[11]}}</td> <!-- ✅ FIXED -->
+                    <td>{{s[2]}}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No students found</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+
+        <!-- 🔄 UPDATES -->
+        <div class="card">
+            <h4>🔄 Profile Update Requests</h4>
+            <table class="table table-warning">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Reg No</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for u in updates %}
+                <tr>
+                    <td>{{u[1]}}</td>
+                    <td>{{u[2]}}</td>
+                    <td>{{u[11]}}</td> <!-- ✅ FIXED -->
+                    <td>
+                        <a href="/approve_update/{{u[0]}}" class="btn btn-success btn-sm">Approve</a>
+                        <a href="/reject_update/{{u[0]}}" class="btn btn-danger btn-sm">Reject</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No update requests</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+
+        <!-- 📚 SUBJECT MANAGEMENT -->
+        <div class="card">
+            <h4>📚 Add Subject</h4>
+
+            <form method="POST">
+                <input type="hidden" name="action" value="add_subject">
+
+                <input type="text" name="subject_name" placeholder="Subject Name">
+                <input type="text" name="department" placeholder="Department">
+                <input type="text" name="semester" placeholder="Semester">
+
+                <button type="submit">Add Subject</button>
+            </form>
+        </div>
+
+        <!-- 👨‍🏫 CREATE TEACHER -->
+        <div class="card">
+            <h4>👨‍🏫 Create Teacher</h4>
+
+            <form method="post">
+                <input type="hidden" name="action" value="create_teacher">
+              
+
+                <input name="t_email" class="form-control mb-2" placeholder="Email" required>
+                <input name="t_username" class="form-control mb-2" placeholder="Username" required>
+                <input name="t_password" class="form-control mb-2" placeholder="Password" required>
+
+                <button class="btn btn-success w-100">Create Teacher</button>
+            </form>
+        </div>
+
+        <!-- 🔐 RESET -->
+        <div class="card">
+            <h4>🔐 Reset Student Credentials</h4>
+
+            <form method="post">
+                <input type="hidden" name="action" value="reset_student">
+
+                <select name="student_id" class="form-control mb-2">
+                    {% for s in students %}
+                    <option value="{{s[0]}}">{{s[1]}}</option>
+                    {% endfor %}
+                </select>
+
+                <input name="s_username" class="form-control mb-2" placeholder="New Username">
+                <input name="s_password" class="form-control mb-2" placeholder="New Password">
+
+                <button class="btn btn-warning w-100">Reset</button>
+            </form>
+        </div>
+
+        <!-- 🔐 PERMISSIONS -->
+        <div class="card">
+            <h4>🔐 Manage Permissions</h4>
+
+            <form method="post" class="row g-2">
+                <div class="col-md-4">
+                    <input name="username" class="form-control" placeholder="Username">
+                </div>
+
+                <div class="col-md-4">
+                    <select name="permission" class="form-control">
+                        <option>manage_users</option>
+                        <option>approve_student</option>
+                        <option>mark_attendance</option>
+                        <option>view_attendance</option>
+                        <option>update_profile</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button name="action" value="add_perm" class="btn btn-success w-50">Add</button>
+                    <button name="action" value="remove_perm" class="btn btn-danger w-50">Remove</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 🔔 NOTIFICATIONS -->
+        <div class="card">
+            <h4>🔔 Notifications</h4>
+
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="add_notification">
+
+                <textarea name="message" class="form-control mb-2" placeholder="Enter message..." required></textarea>
+                <input type="file" name="media" class="form-control mb-2">
+
+                <button class="btn btn-primary w-100">Post Notification</button>
+            </form>
+
+            <hr>
+
+            {% for n in notifications %}
+            <div class="alert alert-light text-dark d-flex justify-content-between align-items-center">
+
+                <div>
+                    <strong>{{n[1]}}</strong><br>
+                    <small>{{n[5]}}</small>
+                </div>
+
+                <div>
+                    <span class="badge bg-dark">{{n[3]}}</span>
+                    <span class="badge bg-success">⬇ {{n[4]}}</span>
+                </div>
+
+                <div>
+                    <a href="/view_notification/{{n[0]}}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="/delete_notification/{{n[0]}}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+
+            </div>
+            {% else %}
+            <p>No notifications yet</p>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

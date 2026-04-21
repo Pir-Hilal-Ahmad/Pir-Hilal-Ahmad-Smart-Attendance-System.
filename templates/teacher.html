@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Teacher Panel</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+background:linear-gradient(-45deg,#1d2671,#c33764,#ff6a00,#ee0979);
+background-size:400% 400%;
+animation:bg 10s infinite;
+color:white;
+}
+@keyframes bg{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+.card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
+border-radius:20px;
+padding:20px;
+margin-top:20px;
+}
+.student-row{
+display:flex;
+justify-content:space-between;
+padding:10px;
+margin-bottom:8px;
+background:rgba(255,255,255,0.1);
+border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar bg-dark navbar-dark">
+<div class="container-fluid">
+<span class="navbar-brand">🚀 Smart Teacher Panel</span>
+<a href="/logout" class="btn btn-danger">Logout</a>
+</div>
+</nav>
+
+<div class="container">
+<div class="card">
+
+<h3 class="text-center">📋 Smart Attendance</h3>
+
+<!-- DEPARTMENT -->
+<select id="department" class="form-control mb-2"></select>
+
+<!-- SEMESTER -->
+<select id="semester" class="form-control mb-2"></select>
+
+<!-- SUBJECT -->
+<select id="subject" class="form-control mb-2"></select>
+
+<form method="post" action="/submit_attendance">
+
+<input type="hidden" name="subject" id="sub_input">
+<input type="hidden" name="semester" id="sem_input">
+
+<h5>Students</h5>
+<div id="students"></div>
+
+<button class="btn btn-primary mt-3 w-100">Submit Attendance</button>
+
+</form>
+
+</div>
+</div>
+
+<script>
+
+// LOAD DEPARTMENTS
+fetch("/get_departments")
+.then(r=>r.json())
+.then(data=>{
+let d=document.getElementById("department");
+d.innerHTML="<option value=''>Select Department</option>";
+data.forEach(x=>d.innerHTML+=`<option value="${x}">${x}</option>`);
+});
+
+// DEPT → SEM
+document.getElementById("department").onchange=function(){
+let dept=this.value;
+
+fetch(`/get_semesters?department=${dept}`)
+.then(r=>r.json())
+.then(data=>{
+let s=document.getElementById("semester");
+s.innerHTML="<option value=''>Select Semester</option>";
+data.forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`);
+});
+};
+
+// SEM → SUBJECT
+document.getElementById("semester").onchange=function(){
+let dept=document.getElementById("department").value;
+let sem=this.value;
+
+fetch(`/get_subjects?department=${dept}&semester=${sem}`)
+.then(r=>r.json())
+.then(data=>{
+let s=document.getElementById("subject");
+s.innerHTML="<option value=''>Select Subject</option>";
+data.forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`);
+});
+};
+
+// SUBJECT → STUDENTS
+document.getElementById("subject").onchange=function(){
+let dept=document.getElementById("department").value;
+let sem=document.getElementById("semester").value;
+let sub=this.value;
+
+document.getElementById("sub_input").value = sub;
+document.getElementById("sem_input").value = sem;
+
+fetch(`/get_students_smart?department=${dept}&semester=${sem}&subject=${sub}`)
+.then(r=>r.json())
+.then(data=>{
+let c=document.getElementById("students");
+c.innerHTML="";
+
+if(data.length===0){
+c.innerHTML="<p>No students found</p>";
+return;
+}
+
+data.forEach(s=>{
+c.innerHTML += `
+<div class="student-row">
+<span>${s[1]} (Reg: ${s[2]})</span>
+
+<div>
+<label><input type="radio" name="status_${s[0]}" value="P" required> 🟢 P</label>
+<label><input type="radio" name="status_${s[0]}" value="A"> 🔴 A</label>
+</div>
+
+<input type="hidden" name="student_ids" value="${s[0]}">
+</div>
+`;
+});
+});
+};
+
+</script>
+
+</body>
+</html>

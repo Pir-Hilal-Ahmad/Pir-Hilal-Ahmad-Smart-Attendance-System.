@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+background:linear-gradient(-45deg,#667eea,#764ba2,#ff6a00,#ee0979);
+background-size:400% 400%;
+animation:bg 10s infinite;
+color:white;
+}
+@keyframes bg{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+.card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
+border-radius:20px;
+padding:20px;
+margin-top:20px;
+animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+.table{
+background:white;
+color:black;
+border-radius:10px;
+overflow:hidden;
+}
+
+.present{color:green;font-weight:bold;}
+.absent{color:red;font-weight:bold;}
+
+.progress{height:20px;border-radius:10px;}
+.progress-bar{font-size:12px;}
+
+.btn:hover{transform:scale(1.05);}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar bg-dark navbar-dark">
+<div class="container-fluid">
+<span class="navbar-brand">🎓 Student Dashboard</span>
+<a href="/update_profile" class="btn btn-warning">Update Profile</a>
+<a href="/logout" class="btn btn-danger">Logout</a>
+</div>
+</nav>
+
+<div class="container">
+
+<!-- PROFILE -->
+<div class="card text-center">
+<h4>👤 Profile</h4>
+
+<img src="{{ url_for('static', filename='uploads/' + (photo if photo else 'default.png')) }}"
+width="100" class="rounded-circle mb-2">
+
+<p><strong>ID:</strong> {{ session.get('user') }}</p>
+</div>
+
+<!-- FILTER -->
+<div class="card">
+<form method="get" class="row g-2">
+
+<div class="col">
+<select name="subject" class="form-control">
+<option value="">All Subjects</option>
+
+{% for s in subjects or [] %}
+<option value="{{ s }}" {% if request.args.get('subject') == s %}selected{% endif %}>
+{{ s }}
+</option>
+{% endfor %}
+
+</select>
+</div>
+
+<div class="col">
+<input type="date" name="start" class="form-control">
+</div>
+
+<div class="col">
+<input type="date" name="end" class="form-control">
+</div>
+
+<div class="col">
+<button class="btn btn-primary w-100">Filter</button>
+</div>
+
+</form>
+</div>
+
+<!-- ATTENDANCE -->
+<div class="card">
+<h4 class="text-center">📋 My Attendance</h4>
+
+<table class="table table-bordered">
+<tr class="table-dark">
+<th>Date</th>
+<th>Subject</th>
+<th>Status</th>
+</tr>
+
+{% if records %}
+{% for r in records %}
+<tr>
+<td>{{ r[0] }}</td>
+<td>{{ r[1] }}</td>
+<td>
+{% if r[2]=='P' %}
+<span class="present">🟢 Present</span>
+{% else %}
+<span class="absent">🔴 Absent</span>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr><td colspan="3" class="text-center">No records</td></tr>
+{% endif %}
+</table>
+
+</div>
+
+<!-- SUBJECT ANALYTICS -->
+<div class="card">
+<h4>📊 Subject-wise Attendance</h4>
+
+{% if subject_data %}
+{% for s, data in subject_data.items() %}
+
+{% set total = data.total if data.total else 0 %}
+{% set present = data.present if data.present else 0 %}
+{% set percent = (present/total*100) if total>0 else 0 %}
+
+<p><strong>{{ s }}</strong> → {{ percent|round(2) }}%</p>
+
+<div class="progress mb-3">
+<div class="progress-bar bg-success" style="width: {{ percent }}%">
+{{ percent|round(2) }}%
+</div>
+</div>
+
+{% endfor %}
+{% else %}
+<p>No subject data</p>
+{% endif %}
+
+</div>
+
+<!-- GRAPH -->
+<div class="card">
+<h4 class="text-center">📊 Attendance Graph</h4>
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let data = {{ subject_data | default({}) | tojson }};
+
+if(!data || Object.keys(data).length===0){
+document.getElementById("chart").style.display="none";
+}else{
+
+let labels=[],values=[];
+
+for(let k in data){
+labels.push(k);
+values.push((data[k].present/data[k].total)*100);
+}
+
+new Chart(document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:labels,
+datasets:[{
+label:"Attendance %",
+data:values
+}]
+},
+options:{
+scales:{y:{beginAtZero:true,max:100}}
+}
+});
+}
+</script>
+
+</body>
+</html>

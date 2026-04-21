@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student Registration</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
+            background-size: 400% 400%;
+            animation: bg 10s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        @keyframes bg {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .card {
+            width: 420px;
+            padding: 25px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn {
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        #subjects_box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h3>🎓 Student Registration</h3>
+
+        <form method="post" enctype="multipart/form-data">
+            
+            <input name="name" class="form-control mb-2" placeholder="Name" required>
+            <input name="parentage" class="form-control mb-2" placeholder="Parentage" required>
+
+            <input name="reg.no" class="form-control mb-2" placeholder="Registration Number" required>
+
+            <!-- 🎓 DEPARTMENT -->
+            <label>Department</label>
+            <select name="department" class="form-control mb-2" required>
+                <option value="">Select Department</option>
+                <option>Computer Science</option>
+                <option>Information Technology</option>
+                <option>Electronics</option>
+                <option>Mechanical</option>
+            </select>
+
+            <!-- 🎓 SEMESTER -->
+            <label>Semester</label>
+            <select name="semester" id="semester" class="form-control mb-2" required>
+                <option value="">Select Semester</option>
+                <option>Semester 1</option>
+                <option>Semester 2</option>
+                <option>Semester 3</option>
+                <option>Semester 4</option>
+                <option>Semester 5</option>
+                <option>Semester 6</option>
+            </select>
+
+            <!-- 📚 SUBJECTS -->
+            <label>Subjects</label>
+<select name="subjects" id="subject" class="form-control mb-2" required>
+    <option value="">Select semester first</option>
+</select>
+
+            <input name="phone" class="form-control mb-2" placeholder="Phone" required>
+            <input name="email" class="form-control mb-2" placeholder="Email" required>
+
+            <input type="file" name="photo" class="form-control mb-2" required>
+
+            <input name="username" class="form-control mb-2" placeholder="Username" required>
+            <input type="password" name="password" class="form-control mb-2" placeholder="Password" required>
+
+            <button class="btn btn-light w-100 mt-2" scr>🚀 Register</button>
+            <!-- <button class="btn btn-light w-100 mt-2" onclick="alert('Registration successful!')">
+🚀 Register
+</button> -->
+
+        </form>
+
+        <a href="/" class="btn btn-outline-light mt-2 w-100">⬅ Back to Home</a>
+
+    </div>
+
+    <!-- 🔥 SUBJECT SCRIPT -->
+    <script>
+
+// when semester changes → load subjects
+document.getElementById("semester").onchange = function() {
+    let dept = document.querySelector("[name='department']").value;
+    let sem = this.value;
+
+    if (!dept || !sem) return;
+
+    fetch(`/get_subjects?department=${dept}&semester=${sem}`)
+    .then(res => res.json())
+    .then(data => {
+        let sub = document.getElementById("subject");
+
+        sub.innerHTML = "<option>Select Subject</option>";
+
+        data.forEach(s => {
+            sub.innerHTML += `<option value="${s}">${s}</option>`;
+        });
+    });
+};
+
+</script>
+    </script>
+
+</body>
+
+</html>
