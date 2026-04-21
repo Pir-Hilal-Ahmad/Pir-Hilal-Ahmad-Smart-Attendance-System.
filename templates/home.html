@@ -141,6 +141,26 @@
             padding: 30px;
             margin-top: 40px;
         }
+
+        .ticker {
+  width: 100%;
+  overflow: hidden;
+  background: #ff4d4d;
+  color: white;
+  padding: 10px 0;
+  font-weight: bold;
+}
+
+.ticker p {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-text 15s linear infinite;
+}
+
+@keyframes scroll-text {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
     </style>
 
 </head>
@@ -201,6 +221,14 @@
         </div>
 
     </div>
+
+    <div class="ticker">
+  <p>
+    ⚠️ Forgot Password not working yet — please make sure you don’t forget your credentials.
+    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+    ⚠️ Site under maintenance.
+  </p>
+</div>
     <div class="card notification-box mt-4">
 
         <h4 class="mb-3">📢 Latest Updates</h4>
