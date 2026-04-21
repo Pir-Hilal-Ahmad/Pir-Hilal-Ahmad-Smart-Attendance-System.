@@ -2,3 +2,4 @@ flask
 gunicorn
 werkzeug
 jinja2
+Flask_Mail
