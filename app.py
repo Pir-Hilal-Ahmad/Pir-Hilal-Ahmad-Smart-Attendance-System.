@@ -3,7 +3,7 @@ import sqlite3, os
 from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime, date
-from flask_mail import Mail, Message
+#from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
