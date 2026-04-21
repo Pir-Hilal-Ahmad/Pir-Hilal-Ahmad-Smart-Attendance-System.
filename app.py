@@ -115,6 +115,12 @@ CREATE TABLE IF NOT EXISTS subjects (
     except:
         pass
 
+    try:
+        from flask_mail import Mail, Message
+    except:
+        Mail= None
+        Message= None
+
     conn.commit()
     conn.close()
 
