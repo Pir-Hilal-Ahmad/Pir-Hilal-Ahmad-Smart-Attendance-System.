@@ -3,3 +3,4 @@ gunicorn
 werkzeug
 jinja2
 Flask_Mail
+python-dotenv
