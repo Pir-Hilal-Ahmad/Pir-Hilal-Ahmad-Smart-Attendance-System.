@@ -564,7 +564,7 @@ def approve_update(id):
             reg_no=?,
             subjects=?
         WHERE id=?
-        """, (u[2], u[3], u[8], u[9], u[1]))
+        """, (u[1], u[2], u[3], u[9], u[0]))
 
         # ✅ update user data
         cur.execute("""
